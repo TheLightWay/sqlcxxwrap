@@ -8,13 +8,15 @@
 #include "sqlcxxwrap/SqlQueryBuilder.hxx"
 
 using StlSqlQueryBuilder = SqlQueryBuilder<std::string,
-                           std::list>;
+                           std::list,
+                           DefaultDebugOutput<std::string>>;
 
 int main( int argc, char* argv[] )
 {
     StlSqlQueryBuilder qb;
 
-    qb.select( ).column( "col1" ).column( "col2" ).as( "mycol" ).column( "col3" );
+    qb.select( ).column( "col1" ).column( "col2" 
+        ).as( "mycol" ).count().column( "col3" ).as( "mycount" ).distinct().column( "col4" ).as( "mydistinct" );
 
     qb.from( "table1" );
 

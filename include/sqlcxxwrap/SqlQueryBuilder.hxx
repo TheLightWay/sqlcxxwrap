@@ -7,7 +7,8 @@
 
 template<
     class TString,
-    template <class> class TList
+    template <class> class TList,
+    class DebugOut
 >
 class SqlQueryBuilder final  
 {
@@ -17,7 +18,7 @@ public:
     ~SqlQueryBuilder() = default;
 
     using TStringList = TList<TString>;
-    using SelfBuilderClass = SqlQueryBuilder<TString,TList>;
+    using SelfBuilderClass = SqlQueryBuilder<TString,TList,DebugOut>;
 
     enum sqDataType
     {
@@ -93,10 +94,14 @@ private:
     static const TString WHERE_KEYWQORD;
     static const TString JOIN_KEYWQORD;
     static const TString ON_KEYWQORD;
+    static const TString DISTINCT_KEYWQORD;
+    static const TString COUNT_KEYWQORD;
+    static const TString OPEN_BRACE_KEYWQORD;
+    static const TString CLOSE_BRACE_KEYWQORD;
 
     static TString join( const TStringList& list, const TString& separator );
 
-    static TString concateWord( TString& instr, const TString& word );
+    static TString concateWord( TString& instr, const TString& word, bool bNoSpace = false );
 
     friend class SelectStatement;
     friend class FromStatement;

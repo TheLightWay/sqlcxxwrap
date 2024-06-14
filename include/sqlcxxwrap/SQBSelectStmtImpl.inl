@@ -1,28 +1,48 @@
-template <class TString, template <class> class TList>
-typename SqlQueryBuilder<TString, TList>::TStringList 
-SqlQueryBuilder<TString, TList>::SelectStatement::columnsList( const TString& tableName ) const
+template <class TString, template <class> class TList, class DebugOut>
+typename SqlQueryBuilder<TString, TList, DebugOut>::TStringList 
+SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement::columnsList( const TString& tableName ) const
 {
     TStringList columns;
 
     for( auto& item : mColumns )
     {
         TString push_name;
+
+        if( item.distinct )
+        {
+            push_name = SelfBuilderClass::concateWord( push_name, SelfBuilderClass::DISTINCT_KEYWQORD );
+        }
+        if( item.count )
+        {
+            push_name = SelfBuilderClass::concateWord( push_name, SelfBuilderClass::COUNT_KEYWQORD, true );
+            push_name = SelfBuilderClass::concateWord( push_name, SelfBuilderClass::OPEN_BRACE_KEYWQORD, true );
+        }
+
+
+        TString colName;
         switch( item.type )
         {
             case ctRegular:
             {
-                push_name = tableName + "." + item.name;
+                colName = ( tableName + "." + item.name );
                 break;
             }
             case ctJoin:
             {
-                push_name = item.joinName + "." + item.name;
+                colName = ( item.joinName + "." + item.name );
                 break;
             }
             default:
             {
                 continue;
             }
+        }
+
+        push_name = SelfBuilderClass::concateWord( push_name, colName );
+
+        if( item.count )
+        {
+            push_name = SelfBuilderClass::concateWord( push_name, SelfBuilderClass::CLOSE_BRACE_KEYWQORD );
         }
 
         if( item.aliasName.length() > 0 )
@@ -40,9 +60,9 @@ SqlQueryBuilder<TString, TList>::SelectStatement::columnsList( const TString& ta
     return columns;
 }
 
-template <class TString, template <class> class TList>
-inline typename SqlQueryBuilder<TString, TList>::SelectStatement& 
-SqlQueryBuilder<TString, TList>::SelectStatement::column( const TString& columnName )
+template <class TString, template <class> class TList, class DebugOut>
+inline typename SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement& 
+SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement::column( const TString& columnName )
 {   
     Column column = { ctRegular, columnName, "", "", 
     this->mbAfterDistinct, this->mbAfterCount };
@@ -54,9 +74,9 @@ SqlQueryBuilder<TString, TList>::SelectStatement::column( const TString& columnN
     return *this;
 }
 
-template <class TString, template <class> class TList>
-inline typename SqlQueryBuilder<TString, TList>::SelectStatement& 
-SqlQueryBuilder<TString, TList>::SelectStatement::joinColumn( const TString& tableName, const TString& columnName )
+template <class TString, template <class> class TList, class DebugOut>
+inline typename SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement& 
+SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement::joinColumn( const TString& tableName, const TString& columnName )
 {   
     Column column = { ctJoin, columnName, "", tableName, 
     this->mbAfterDistinct, this->mbAfterCount };
@@ -68,9 +88,9 @@ SqlQueryBuilder<TString, TList>::SelectStatement::joinColumn( const TString& tab
     return *this;
 }
 
-template <class TString, template <class> class TList>
-typename SqlQueryBuilder<TString, TList>::SelectStatement& 
-SqlQueryBuilder<TString, TList>::SelectStatement::as( const TString& aliasName )
+template <class TString, template <class> class TList, class DebugOut>
+typename SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement& 
+SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement::as( const TString& aliasName )
 {
     if( mColumns.empty() )
     {
@@ -84,25 +104,25 @@ SqlQueryBuilder<TString, TList>::SelectStatement::as( const TString& aliasName )
     return *this;
 }
 
-template <class TString, template <class> class TList>
-inline typename SqlQueryBuilder<TString, TList>::SelectStatement& 
-SqlQueryBuilder<TString, TList>::SelectStatement::distinct()
+template <class TString, template <class> class TList, class DebugOut>
+inline typename SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement& 
+SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement::distinct()
 {   
     this->mbAfterDistinct = true;
     return *this;
 }
 
-template <class TString, template <class> class TList>
-inline typename SqlQueryBuilder<TString, TList>::SelectStatement& 
-SqlQueryBuilder<TString, TList>::SelectStatement::count()
+template <class TString, template <class> class TList, class DebugOut>
+inline typename SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement& 
+SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement::count()
 {   
     this->mbAfterCount = true;
     return *this;
 }
 
-template <class TString, template <class> class TList>
+template <class TString, template <class> class TList, class DebugOut>
 void
-SqlQueryBuilder<TString, TList>::SelectStatement::reset()
+SqlQueryBuilder<TString, TList, DebugOut>::SelectStatement::reset()
 {
     mColumns.clear();
     mbAfterDistinct = false;

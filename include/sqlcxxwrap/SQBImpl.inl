@@ -1,5 +1,5 @@
-template <class TString, template <class> class TList>
-TString SqlQueryBuilder<TString, TList>::join( const TStringList& list, const TString& separator )
+template <class TString, template <class> class TList, class DebugOut>
+TString SqlQueryBuilder<TString, TList, DebugOut>::join( const TStringList& list, const TString& separator )
 {
     TString ret;
     
@@ -16,15 +16,19 @@ TString SqlQueryBuilder<TString, TList>::join( const TStringList& list, const TS
     return ret;
 }
 
-template <class TString, template <class> class TList>
-TString SqlQueryBuilder<TString, TList>::concateWord( TString& instr, const TString& word )
+template <class TString, template <class> class TList, class DebugOut>
+TString SqlQueryBuilder<TString, TList, DebugOut>::concateWord( TString& instr, const TString& word, bool bNoSpace )
 {
     TString ret;
         
     if( instr.length() > 0 )
     {
         ret += instr;
-        ret += " ";
+
+        if( !bNoSpace )
+        {
+            ret += " ";
+        }
     }
 
     ret += word;
@@ -32,8 +36,8 @@ TString SqlQueryBuilder<TString, TList>::concateWord( TString& instr, const TStr
     return ret;
 }
 
-template <class TString, template <class> class TList>
-TString SqlQueryBuilder<TString, TList>::query() const
+template <class TString, template <class> class TList, class DebugOut>
+TString SqlQueryBuilder<TString, TList, DebugOut>::query() const
 {
     TString ret;
     ret = concateWord( ret, SELECT_KEYWQORD );

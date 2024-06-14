@@ -1,13 +1,14 @@
 #ifndef __SQLQUERYPREREQ_HXX
 #define __SQLQUERYPREREQ_HXX
 
-template<
-    class TStringType,
-    class TStringListType
->
-class SqlStatementTraits
+template<class TString>
+class DefaultDebugOutput
 {
 public:
+    DefaultDebugOutput& operator <<( const TString& instr ) 
+    { 
+        return *this; 
+    }
 };
 
 
