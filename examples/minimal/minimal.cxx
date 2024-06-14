@@ -8,7 +8,6 @@
 #include "sqlcxxwrap/SqlQueryBuilder.hxx"
 
 using StlSqlQueryBuilder = SqlQueryBuilder<std::string,
-                           std::string::value_type,
                            std::list>;
 
 int main( int argc, char* argv[] )
