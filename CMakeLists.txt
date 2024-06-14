@@ -14,7 +14,7 @@ set( TOP_LEVEL_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}" )
 list( APPEND CMAKE_MODULE_PATH "${TOP_LEVEL_SOURCE_DIR}/cmake" )
 list( APPEND CMAKE_MODULE_PATH "${TOP_LEVEL_SOURCE_DIR}/cmake/modules" )
 
-include(CTest)
+include( CTest )
 
 
 include( Functions )
@@ -24,9 +24,16 @@ DisallowIntreeBuilds( )
 MakeOutputDirectories( )
 
 
-add_compile_definitions(  $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_DEPRECATE> )
-add_compile_definitions(  $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS> )
-add_compile_definitions(  $<$<CONFIG:DEBUG>:_DEBUG> )
+set( PUB_INCLUDE_DIR "${TOP_LEVEL_SOURCE_DIR}/include" )
+
+set( SQWRP_HEADER_FILES 
+    ${PUB_INCLUDE_DIR}/sqlcxxwrap/SqlQueryPrereq.hxx
+    ${PUB_INCLUDE_DIR}/sqlcxxwrap/SqlQueryBuilder.hxx 
+)
 
 
-add_subdirectory( src )
+add_library( sqlcxxwrap INTERFACE  ${SQWRP_HEADER_FILES} )
+target_include_directories( sqlcxxwrap INTERFACE ${PUB_INCLUDE_DIR} )
+
+
+add_subdirectory( examples )
