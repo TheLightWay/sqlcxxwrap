@@ -35,33 +35,20 @@ public:
         ~SelectStatement() = default;
     public:
 
-        SelectStatement& column( const TString& columnName )
-        {   
-            Column column = { ctRegular, RegularColumn{ columnName, "" } };
-            
-            mColumns.push_back( column );
-            return *this;
-        }
-
-    private:
-
+        SelectStatement& column( const TString& columnName );
         
-        
-        struct RegularColumn final 
-        {
-            TString name;
-            TString aliasName;
-        };
 
-        struct JoinColumn final
-        {
-            TString name;
-            TString table;
-            TString aliasName;
-        };
+        SelectStatement& joinColumn( const TString& tableName, const TString& columnName );
+       
+        SelectStatement& as( const TString& aliasName );
 
-        using ColumnVariant = std::variant<RegularColumn, JoinColumn>;
+        SelectStatement& distinct();
 
+        SelectStatement& count();
+
+        void reset();
+
+    private:      
         enum ColumnType
         {
             ctRegular,
@@ -71,55 +58,19 @@ public:
         struct Column
         {
             ColumnType type;
-            ColumnVariant data;
+            TString name;
+            TString aliasName;
+            TString joinName;
+            bool distinct;
+            bool count;
         };
+
+        bool mbAfterDistinct = false;
+        bool mbAfterCount = false;
 
         TList<Column> mColumns;
 
-        TStringList columnsList( const TString& tableName ) const
-        {
-            TStringList columns;
-
-            for( auto& item : mColumns )
-            {
-                switch( item.type )
-                {
-                    case ctRegular:
-                    {
-                        auto regColumn = std::get<RegularColumn>( item.data );
-                        TString push_name = tableName + "." + regColumn.name;
-
-                        if( regColumn.aliasName.length() > 0 )
-                        {
-                            push_name += " AS " + regColumn.aliasName;
-                        }
-
-                        columns.push_back( push_name );
-                        break;
-                    }
-                    case ctJoin:
-                    {
-                        auto jointColumn = std::get<JoinColumn>( item.data );
-                        TString push_name = jointColumn.table + "." + jointColumn.name;
-
-                        if( jointColumn.aliasName.length() > 0 )
-                        {
-                            push_name += " AS " + jointColumn.aliasName;
-                        }
-
-                        columns.push_back( push_name );
-                        break;
-                    }
-                    default:
-                    {
-                        continue;
-                    }
-                }
-            }
-
-            return columns;
-        }
-
+        TStringList columnsList( const TString& tableName ) const;
     };
 
     SelectStatement& select() 
@@ -132,52 +83,20 @@ public:
         mTableName = tableName;
     }
 
-    TString query() const
-    {
-        TString ret;
-        ret = concateWord( ret, SELECT_KEYWQORD );
-
-        ret = concateWord( ret, join( mSelect.columnsList(  mTableName ), "," ) );
-        ret = concateWord( ret, FROM_KEYWQORD );
-        ret = concateWord( ret, mTableName );
-        
-        return ret;
-    }
+    TString query() const;
 
 private:
-    const TString SELECT_KEYWQORD = "SELECT";
-    const TString FROM_KEYWQORD = "FROM";
-    TString join( const TStringList& list, const TString& separator ) const
-    {
-        TString ret;
-    
-        for( auto& item : list )
-        {
-            if( ret.length() > 0 )
-            {
-                ret += separator;
-            }
+    static const TString SELECT_KEYWQORD;
+    static const TString FROM_KEYWQORD;
+    static const TString COMMA_KEYWQORD;
+    static const TString AS_KEYWQORD;
+    static const TString WHERE_KEYWQORD;
+    static const TString JOIN_KEYWQORD;
+    static const TString ON_KEYWQORD;
 
-            ret += item;
-        }
+    static TString join( const TStringList& list, const TString& separator );
 
-        return ret;
-    }
-
-    TString concateWord( TString& instr, const TString& word ) const
-    {
-        TString ret;
-        
-        if( instr.length() > 0 )
-        {
-            ret += instr;
-            ret += " ";
-        }
-
-        ret += word;
-        
-        return ret;
-    }
+    static TString concateWord( TString& instr, const TString& word );
 
     friend class SelectStatement;
     friend class FromStatement;
@@ -186,4 +105,11 @@ private:
     TString mTableName;
 };
 
+#include "sqlcxxwrap/SQBConsts.inl"
+
+#include "sqlcxxwrap/SQBSelectStmtImpl.inl"
+
+#include "sqlcxxwrap/SQBImpl.inl"
+
 #endif // __SQLQUERYBUILDER_HXX
+

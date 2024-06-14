@@ -14,7 +14,7 @@ int main( int argc, char* argv[] )
 {
     StlSqlQueryBuilder qb;
 
-    qb.select( ).column( "col1" ).column( "col2" ).column( "col3" );
+    qb.select( ).column( "col1" ).column( "col2" ).as( "mycol" ).column( "col3" );
 
     qb.from( "table1" );
 
